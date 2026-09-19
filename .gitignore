@@ -1,0 +1,15 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+
+# Binaries dropped into bin/ to pin a build are local; never commit them.
+bin/*
+!bin/.gitkeep
+
+# Downloads and scratch output from running the nodes or tests outside ComfyUI.
+models/
+output/
+temp/
+*.part

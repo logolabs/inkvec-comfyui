@@ -1,0 +1,31 @@
+[project]
+name = "inkvec-comfyui"
+version = "0.1.0"
+description = "ComfyUI nodes for Inkvec, the LogoLabs raster-to-SVG tracer: trace to SVG (with transparency), save SVG, and optional JPEG/WebP denoise and x4 upscale for logos before tracing."
+authors = [{ name = "LogoLabs" }]
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.9"
+# Nothing beyond what ComfyUI already installs (torch, numpy, Pillow). The tracer itself is
+# a native binary fetched on first use; the extras below are optional.
+dependencies = []
+classifiers = [
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: MacOS",
+]
+
+[project.optional-dependencies]
+# Renders the traced SVG back to pixels for the preview/mask outputs, and for Denoise auto.
+preview = ["resvg-py"]
+# Inkvec Denoise needs onnxruntime (or onnxruntime-gpu); Inkvec Upscale needs einops.
+cleaners = ["onnxruntime", "huggingface_hub", "einops"]
+
+[project.urls]
+Repository = "https://github.com/logolabs/inkvec-comfyui"
+Documentation = "https://github.com/logolabs/inkvec-comfyui#readme"
+"Bug Tracker" = "https://github.com/logolabs/inkvec-comfyui/issues"
+
+[tool.comfy]
+PublisherId = "logolabs-org"
+DisplayName = "Inkvec"

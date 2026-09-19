@@ -1,0 +1,3 @@
+Drop an inkvec binary here (inkvec.exe on Windows, inkvec elsewhere) to pin a
+build: it is used before any downloaded copy. Files in bin/ are not committed.
+INKVEC_BIN, when set, takes precedence over this directory.
