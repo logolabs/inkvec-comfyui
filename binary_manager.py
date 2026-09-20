@@ -37,7 +37,9 @@ RELEASES_URL = f"https://github.com/{REPO}/releases"
 _API_LATEST = f"https://api.github.com/repos/{REPO}/releases/latest"
 _WEB_LATEST = f"{RELEASES_URL}/latest"
 
-#: Oldest release whose flags this package passes. Every flag the node uses exists in 0.1.0.
+#: Oldest release the node runs against. Every flag it passes by default exists in 0.1.0; the
+#: 0.1.4-only forms (--no-native-alpha, --content-units) go over the wire only when a widget
+#: is moved off its default, and an older binary reports them as unknown options.
 MIN_VERSION = (0, 1, 0)
 NET_TIMEOUT = 60
 HEALTH_TIMEOUT = 30

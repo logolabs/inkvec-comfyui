@@ -90,14 +90,18 @@ class Option:
         return [self.cli_flag, str(value)] if str(value) else []
 
 
-#: inkvec 0.1.x, from `inkvec --help` of v0.1.3 (identical flags in 0.1.0 to 0.1.3).
+#: inkvec 0.1.4, from its `inkvec --help` and bindings/options.schema.json. The defaults pass
+#: only flags that exist in every 0.1.x release; the 0.1.4-only forms (--no-native-alpha,
+#: --content-units) go over the wire just when a widget is moved off its default, where an
+#: older binary reports an unknown option. Ranges follow the schema where the schema records
+#: one; the other bounds are widget limits.
 BUILTIN: tuple[Option, ...] = (
     Option("precision", "float", 0.1,
            "Sets the MDL cost of a coordinate: lambda = ln(extent / precision). Smaller keeps more "
            "detail with more points. It does not set the digits the emitter writes; output "
            "coordinates are fixed at 2 decimals.", 0.01, 10.0, 0.01),
     Option("min_area", "float", 2.0, "Discard features below this area, in px^2.", 0.0, 10000.0, 0.5),
-    Option("colors", "int", 64, "Maximum palette size.", 2, 1024, 1),
+    Option("colors", "int", 64, "Maximum palette size.", 1, 4096, 1),
     Option("merge", "float", 0.035, "OKLab distance below which two colours are one ink.", 0.0, 0.5, 0.001),
     Option("max_dim", "int", 2048,
            "Inputs larger than this on their longer side are traced at this size and the SVG is "
@@ -110,9 +114,9 @@ BUILTIN: tuple[Option, ...] = (
            "Transparent margin around the output, as a fraction of the larger side; the viewBox "
            "grows, the geometry does not move.", 0.0, 0.5, 0.01),
     Option("cutout", "bool", False,
-           "Carry the input's transparency into the output: transparent areas stay holes, a shape "
-           "drawn at one opacity comes back with fill-opacity, and white artwork on a transparent "
-           "ground survives."),
+           "With native_alpha off, carry the input's transparency into the SVG: transparent areas "
+           "stay holes, a shape drawn at one opacity keeps fill-opacity, and white artwork on a "
+           "transparent ground survives. Changes nothing with native_alpha on (the default)."),
     Option("no_background", "bool", False,
            "Knock the background out: the face that covers the whole canvas is not painted, so the "
            "artwork sits on transparency."),
@@ -121,7 +125,17 @@ BUILTIN: tuple[Option, ...] = (
            "Treat the input as lossily compressed. auto reads the container, on forces noise-aware "
            "intake, off trusts the pixels.", choices=("auto", "on", "off")),
     Option("harmonize", "bool", True, "Repeating shape harmonization (on by default)."),
-    Option("harmonize_threshold", "float", 0.92, "Shape equivalence IoU threshold.", 0.5, 1.0, 0.01),
+    Option("harmonize_threshold", "float", 0.92, "Shape-equivalence IoU threshold for harmonization.", 0.0, 1.0, 0.01),
+    Option("native_alpha", "bool", True,
+           "Trace transparency natively: each ink is a colour and an opacity, and the transparent "
+           "ground is an ink of its own, instead of the image being composited onto a matte "
+           "first. Holes stay holes, glows and shadows stay translucent, and white artwork on a "
+           "transparent ground traces. An opaque image traces the same either way. Needs inkvec "
+           "0.1.4."),
+    Option("content_units", "bool", False,
+           "Scale the fit tolerances with the raster, so a large, simple drawing gets the "
+           "parameter count of a small one. Trades fidelity for parsimony: small squares can come "
+           "back as circles and thin rings broken. Needs inkvec 0.1.4."),
 )
 
 
@@ -136,17 +150,21 @@ class Override:
 
 HARMONIZE_TOOLTIP = (
     "Shape harmonization (the CLI default: on). Marks that repeat across the drawing are matched "
-    "and redrawn from one consensus shape, which saves paths on repetitive art. Known cost: on "
-    "fine line art near the raster's resolution (hairlines, thin rings, small rounded details) it "
-    "can move thin lines by about a pixel and push rounded details toward the shared shape. Turn "
-    "it off for fine line art."
+    "by outline similarity and redrawn from one consensus geometry per cluster, which saves "
+    "parameters on repetitive art. A mark takes the consensus only where that stays within 0.1 px "
+    "of the boundary traced for it and costs fewer parameters; a face another face is drawn "
+    "against, and a fitted circle or rounded rectangle, is never moved. Turn it off to skip the "
+    "pass."
 )
 
 OVERRIDES = {
     "cutout": Override(
         "Carry the input's transparency into the SVG: transparent areas stay holes, a shape drawn "
         "at one opacity keeps fill-opacity, and white artwork on a transparent ground survives. "
-        "auto = on when the image or the mask input has any transparency, off for opaque images.",
+        "auto = on when the image or the mask input has any transparency, off for opaque images. "
+        "Inkvec 0.1.4 traces transparency natively (native_alpha), which already carries it out, "
+        "so there this only matters with native_alpha off; on 0.1.3 and older it is what keeps "
+        "the holes, which is why auto passes it for any transparent image.",
         auto_on_alpha=True,
     ),
     "harmonize": Override(HARMONIZE_TOOLTIP),
@@ -154,6 +172,13 @@ OVERRIDES = {
         "Noise-aware intake for compressed input. The CLI's auto reads the file type, but ComfyUI "
         "hands the node decoded pixels (written as PNG), so auto behaves like a PNG here. Set on "
         "for JPEG/WebP sources and for images from Inkvec Denoise (inkvec --restore does the same)."
+    ),
+    "native_alpha": Override(
+        "Trace transparency natively: each ink carries an opacity and the transparent ground is "
+        "an ink of its own -- holes stay holes, glows and shadows stay translucent, and white "
+        "artwork on a transparent ground traces. An opaque image traces the same either way, so "
+        "leave it on. Off composites onto a matte first, as inkvec releases up to 0.1.3 did. "
+        "Needs inkvec 0.1.4; an older binary reports --no-native-alpha as an unknown option."
     ),
 }
 

@@ -26,6 +26,11 @@ def test_boolean_mapping(ink):
     assert "--cutout" not in o.build_args({"cutout": "auto"}, has_alpha=False, opts=table)
     assert "--cutout" in o.build_args({"cutout": "on"}, has_alpha=False, opts=table)
     assert "--cutout" not in o.build_args({"cutout": "off"}, has_alpha=True, opts=table)
+    # The 0.1.4 booleans: defaults pass nothing, moving off the default passes the flag.
+    assert "--no-native-alpha" in o.build_args({"native_alpha": False}, opts=table)
+    assert "--native-alpha" not in o.build_args({"native_alpha": True}, opts=table)
+    assert "--content-units" in o.build_args({"content_units": True}, opts=table)
+    assert "--content-units" not in o.build_args({"content_units": False}, opts=table)
 
 
 def test_widgets_come_from_the_table(ink):
@@ -36,7 +41,9 @@ def test_widgets_come_from_the_table(ink):
     assert types["cutout"][0] == ["auto", "on", "off"]
     assert types["lossy"][0] == ["auto", "on", "off"]
     assert types["harmonize"][1]["default"] is True
-    assert "about a pixel" in types["harmonize"][1]["tooltip"]
+    assert "within 0.1 px" in types["harmonize"][1]["tooltip"]
+    assert types["native_alpha"][1]["default"] is True
+    assert types["content_units"][1]["default"] is False
     assert types["merge"][1]["step"] == 0.001
 
 

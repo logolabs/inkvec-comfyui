@@ -22,6 +22,9 @@ def rgba_image(kind: str, size: int = 128) -> Image.Image:
     elif kind == "copper_frame":  # coloured square with a transparent hole
         d.rectangle([24 * s, 24 * s, 104 * s, 104 * s], fill=COPPER + (255,))
         d.ellipse([48 * s, 48 * s, 80 * s, 80 * s], fill=(0, 0, 0, 0))
+    elif kind == "copper_field":  # colour edge to edge, with a small transparent hole
+        d.rectangle([0, 0, 127 * s, 127 * s], fill=COPPER + (255,))
+        d.ellipse([56 * s, 56 * s, 72 * s, 72 * s], fill=(0, 0, 0, 0))
     else:
         raise ValueError(kind)
     return img
@@ -141,12 +144,32 @@ def test_rgba_tensor_without_mask(ink):
     assert float((1.0 - mask_out[0])[2, 2]) < 0.02
 
 
-def test_cutout_off_paints_the_matte(ink):
-    """Why cutout defaults to auto: without it, white art on transparency traces as a
-    white canvas (the CLI's default behaviour)."""
-    image, mask = as_loadimage(rgba_image("white_disc"))
-    svgs, _, mask_out = run_trace(ink, image, mask, cutout="off")
-    assert full_canvas_rects(parse_svg(svgs[0])), "expected the CLI default to paint the canvas"
+def resolved_version(ink) -> tuple:
+    """The (major, minor, patch) of the binary the node resolved, once it is in place."""
+    return ink.binary_manager.parse_version(ink.binary_manager.binary_info()[1])
+
+
+def test_native_alpha_keeps_holes_without_cutout(ink):
+    """inkvec 0.1.4 traces transparency natively, so a hole survives with cutout off (the
+    no-flag default): the copper field is painted, the hole in it stays transparent."""
+    if resolved_version(ink) < (0, 1, 4):
+        pytest.skip("native transparency is the default from inkvec 0.1.4")
+    image, mask = as_loadimage(rgba_image("copper_field"))
+    svgs, _, mask_out = run_trace(ink, image, mask, cutout="off")  # native_alpha at its default
+    assert full_canvas_rects(parse_svg(svgs[0])) == [], "the SVG paints a full-canvas matte"
+    assert float((1.0 - mask_out[0])[2, 2]) > 0.98  # the field itself is painted
+    assert float(mask_out[0, 64, 64]) > 0.98  # the hole is a hole, not a patch of white
+
+
+def test_matte_path(ink):
+    """native_alpha off and cutout off -- the old matte path, as inkvec up to 0.1.3
+    defaulted to: the input is composited onto white first, so a full-bleed picture with a
+    small transparent hole comes back with the hole painted over."""
+    if resolved_version(ink) < (0, 1, 4):
+        pytest.skip("needs inkvec 0.1.4's --no-native-alpha")
+    image, mask = as_loadimage(rgba_image("copper_field"))
+    svgs, _, mask_out = run_trace(ink, image, mask, cutout="off", native_alpha=False)
+    assert full_canvas_rects(parse_svg(svgs[0])), "expected the matte path to paint the canvas"
     assert float(mask_out.max()) < 0.01
 
 
