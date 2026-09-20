@@ -42,7 +42,7 @@ app.registerExtension({
       if (!w || !h) return;
       const cx = w / 2;
       const markH = 34;
-      const markW = markH * (1024 / 1024); // the mark's own viewBox aspect
+      const markW = markH * (514.25 / 742.25); // the mark's own viewBox aspect
       const top = h - BRAND.strip + 4;
       ctx.save();
       if (markReady) {
