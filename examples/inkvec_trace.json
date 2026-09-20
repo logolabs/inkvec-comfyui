@@ -110,6 +110,8 @@
         "auto",
         true,
         0.92,
+        true,
+        false,
         300,
         ""
       ]
