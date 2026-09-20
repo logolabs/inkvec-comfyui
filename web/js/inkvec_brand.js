@@ -7,7 +7,7 @@
 import { app } from "../../scripts/app.js";
 
 const BRAND = {
-  mark: "data:image/svg+xml;charset=utf-8,%3Csvg%20width%3D%221350%22%20height%3D%221800%22%20viewBox%3D%220%200%201350%201800%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20fill-rule%3D%22evenodd%22%20clip-rule%3D%22evenodd%22%20d%3D%22M665.2%2044.6%20582.8%20154.7c-409%20546.9-596.5%20851.2-490%201174.5C196%201643%20542.3%201838.1%20869.5%201714.5A624.2%20624.2%200%20001252%201278.1C1323.2%20973%201138.4%20674.8%20734.9%20137.7Zm355.2%201109.3-100.3.1A255.1%20255.1%200%2000652.3%20898.7%20254.9%20254.9%200%2000410.9%201153l-100.4.9%20354.9%20538.4Z%22%20fill%3D%22%23c9754a%22%2F%3E%3Ccircle%20fill%3D%22%23c9754a%22%20cx%3D%22665.2%22%20cy%3D%221153.6%22%20r%3D%22159.9%22%2F%3E%3C%2Fsvg%3E",
+  mark: "data:image/svg+xml;charset=utf-8,%3Csvg%20width%3D%22427%22%20height%3D%22597%22%20viewBox%3D%220%200%20427%20597%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20fill-rule%3D%22evenodd%22%20clip-rule%3D%22evenodd%22%20d%3D%22M211.03%201.72%20208.21%209.5C153.7%20160.07-16.65%20252.01%2015.25%20420.09A203.99%20198.09%2076.07%2000340.73%20531.98a201.56%20201.56%200%200057.82-221.87C363.52%20204.52%20246.61%20113.87%20211.03%201.72ZM71.45%20372%20210.83%20532.18%20350.27%20372c-67.04%201.6-36.01-14.95-139.36%20102.24l-81.52-93.27c-14.07-10.13-19.25-9.06-57.94-8.97Z%22%20fill%3D%22%23c9754a%22%2F%3E%3Ccircle%20fill%3D%22%23c9754a%22%20cx%3D%22210.88%22%20cy%3D%22341.11%22%20r%3D%2247.35%22%2F%3E%3C%2Fsvg%3E",
   wordmark: "INKVEC",
   color: "#c9754a",
   strip: 56, // reserved at the bottom of the node, mark + gap + tracked caps
@@ -42,7 +42,7 @@ app.registerExtension({
       if (!w || !h) return;
       const cx = w / 2;
       const markH = 34;
-      const markW = markH * (1350 / 1800); // the mark's own viewBox aspect
+      const markW = markH * (427 / 597); // the mark's own viewBox aspect
       const top = h - BRAND.strip + 4;
       ctx.save();
       if (markReady) {
