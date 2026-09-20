@@ -314,8 +314,8 @@ class InkvecUpscale:
 
     DESCRIPTION = (
         "x4 upscaler for logos, icons and flat artwork (MambaIRv2-Small fine-tune, "
-        "Logolabs/inkvec-sr-001), for small or blurred inputs before tracing. Needs einops; "
-        "weights download on first use. Deterministic: the routing RNG is pinned."
+        "Logolabs/inkvec-sr-001), for small or blurred inputs before tracing. Weights "
+        "download on first use. Deterministic: the routing RNG is pinned."
     )
     CATEGORY = CATEGORY
     FUNCTION = "upscale"
@@ -385,8 +385,8 @@ class InkvecDenoise:
 
     DESCRIPTION = (
         "Restorer for JPEG, WebP and AI-decoder damage on logos and flat artwork (ConvNeXt U-Net, "
-        "Logolabs/inkvec-denoiser-001), run like `inkvec --restore`. Needs onnxruntime; weights "
-        "download on first use. auto needs the inkvec binary and resvg-py."
+        "Logolabs/inkvec-denoiser-001), run like `inkvec --restore`. Weights download on first "
+        "use. auto needs the inkvec binary and a rendered trace (resvg-py)."
     )
     CATEGORY = CATEGORY
     FUNCTION = "denoise"

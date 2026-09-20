@@ -1,0 +1,7 @@
+# Everything the four nodes use, so every feature works after the install (ComfyUI-Manager
+# installs this file for a git clone; a pip install of the package gets the same list from
+# pyproject.toml). torch, numpy and Pillow come with ComfyUI and are deliberately not listed.
+resvg-py
+onnxruntime
+huggingface_hub
+einops

@@ -1,25 +1,33 @@
 [project]
 name = "inkvec-comfyui"
-version = "0.1.0"
-description = "ComfyUI nodes for Inkvec, the LogoLabs raster-to-SVG tracer: trace to SVG (with transparency), save SVG, and optional JPEG/WebP denoise and x4 upscale for logos before tracing."
+version = "0.1.4"
+description = "ComfyUI nodes for Inkvec, the LogoLabs raster-to-SVG tracer: trace to SVG (with native transparency), save SVG, and JPEG/WebP denoise and x4 upscale for logos before tracing."
 authors = [{ name = "LogoLabs" }]
 readme = "README.md"
 license = { file = "LICENSE" }
 requires-python = ">=3.9"
-# Nothing beyond what ComfyUI already installs (torch, numpy, Pillow). The tracer itself is
-# a native binary fetched on first use; the extras below are optional.
-dependencies = []
+# Everything the four nodes use, so every feature works after the install: resvg-py renders
+# the traced SVG back to pixels (preview/mask outputs, Denoise auto), onnxruntime runs the
+# denoiser, einops the upscaler, huggingface_hub fetches the weights. (torch, numpy and
+# Pillow come with ComfyUI and are deliberately not listed.) The tracer itself is a native
+# binary fetched on first use.
+dependencies = [
+    "resvg-py",
+    "onnxruntime",
+    "huggingface_hub",
+    "einops",
+]
 classifiers = [
     "Operating System :: Microsoft :: Windows",
     "Operating System :: POSIX :: Linux",
     "Operating System :: MacOS",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Multimedia :: Graphics :: Graphics Conversion",
 ]
-
-[project.optional-dependencies]
-# Renders the traced SVG back to pixels for the preview/mask outputs, and for Denoise auto.
-preview = ["resvg-py"]
-# Inkvec Denoise needs onnxruntime (or onnxruntime-gpu); Inkvec Upscale needs einops.
-cleaners = ["onnxruntime", "huggingface_hub", "einops"]
 
 [project.urls]
 Repository = "https://github.com/logolabs/inkvec-comfyui"
@@ -29,3 +37,8 @@ Documentation = "https://github.com/logolabs/inkvec-comfyui#readme"
 [tool.comfy]
 PublisherId = "logolabs-org"
 DisplayName = "Inkvec"
+
+[tool.ruff]
+# vendor/ holds the MambaIRv2 architecture and the selective scan kept close to their
+# upstream sources on purpose; lint nits there are not worth diverging over.
+extend-exclude = ["vendor"]
